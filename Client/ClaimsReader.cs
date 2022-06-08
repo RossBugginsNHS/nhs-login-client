@@ -12,8 +12,13 @@ namespace NHS.Login.Client
     {
         IHttpContextAccessor _accessor;
         NHSLoginSettings _settings;
-        public ClaimsReader(IHttpContextAccessor accessor, IOptions<NHSLoginSettings> settings)
+        IHttpClientFactory  _clientFactory;
+        public ClaimsReader(
+            IHttpClientFactory  clientFactory,
+            IHttpContextAccessor accessor, 
+            IOptions<NHSLoginSettings> settings)
         {
+            _clientFactory = clientFactory;
             _settings = settings.Value;
             _accessor = accessor;
         }
@@ -21,7 +26,7 @@ namespace NHS.Login.Client
         {
             var accessToken = await _accessor.HttpContext.GetTokenAsync("access_token");
 
-            var client = new HttpClient();
+            var client = _clientFactory.CreateClient();
 
             var disco = await client.GetDiscoveryDocumentAsync(_settings.Authority);
 
