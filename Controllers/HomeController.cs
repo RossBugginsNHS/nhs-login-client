@@ -13,10 +13,10 @@ namespace NHS.Login.Dotnet.Core6.Sample.Controllers
 
     public class HomeController
     {
-        ClaimsReader _cliamsReader;
-        public HomeController(ClaimsReader cliamsReader)
+        ClaimsReader _claimsReader;
+        public HomeController(ClaimsReader claimsReader)
         {
-            _cliamsReader = cliamsReader;
+            _claimsReader = claimsReader;
         }
 
 
@@ -24,7 +24,7 @@ namespace NHS.Login.Dotnet.Core6.Sample.Controllers
         [Authorize]
         public async IAsyncEnumerable<Claim> GetAsync()
         {
-            await foreach (var claim in _cliamsReader.GetAsync())
+            await foreach (var claim in _claimsReader.GetAsync())
                 yield return claim;
         }
 
