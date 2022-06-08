@@ -24,7 +24,7 @@ namespace NHS.Login.Dotnet.Core6.Sample.Controllers
         [Authorize]
         public async IAsyncEnumerable<Claim> GetAsync()
         {
-            await foreach (var claim in _claimsReader.GetAsync())
+            await foreach (var claim in _claimsReader.GetClaimsAsync())
                 yield return claim;
         }
 
