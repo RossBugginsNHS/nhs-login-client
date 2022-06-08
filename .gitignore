@@ -1,0 +1,9 @@
+*.key
+*.pem
+appsettings.Development.json
+appsettings.Production.json
+appsettings.json
+obj
+bin
+.vscode
+Properties
