@@ -11,6 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static WebApplicationBuilder AddNHSLogin(this WebApplicationBuilder builder )
         {
+            builder.Services.AddHttpClient();
             builder.Services.Configure<NHSLoginSettings>(builder.Configuration.GetSection(NHSLoginSettings.Name));
             builder.Services.AddTransient<ClaimsReader>();
             var conf = new NHSLoginSettings();
