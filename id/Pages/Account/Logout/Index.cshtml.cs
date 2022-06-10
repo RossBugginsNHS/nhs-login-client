@@ -73,6 +73,10 @@ public class Index : PageModel
                 
             // delete local authentication cookie
             await HttpContext.SignOutAsync();
+
+            HttpContext.Response.Cookies.Delete("idsrv.session", new CookieOptions { Secure = true });
+            HttpContext.Response.Cookies.Delete(".AspNetCore.Identity.Application", new CookieOptions { Secure = true });
+                
         
 
             // raise the logout event
