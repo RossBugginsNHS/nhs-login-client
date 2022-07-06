@@ -34,10 +34,11 @@ namespace NHS.Login.Client
         }
         public string CreateClientAuthJwt()
         {
+            
             var claims = new List<Claim>()
             {
                 new Claim("sub", _settings.Subject),
-                new Claim("jti", Guid.NewGuid().ToString())
+                new Claim("jti", Guid.NewGuid().ToString()),
             };
             var payload = new JwtPayload(_settings.Issuer, _settings.Audience, claims, null, DateTime.Now.Add(Expiry), DateTime.Now);
 

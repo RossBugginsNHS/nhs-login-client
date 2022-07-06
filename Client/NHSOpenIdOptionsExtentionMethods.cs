@@ -25,6 +25,11 @@ namespace Microsoft.Extensions.DependencyInjection
             options.Authority = settings.Authority;
             options.ResponseType = "code";
             options.ResponseMode = "form_post";
+            options.Scope.Clear();
+            options.Scope.Add("openid");
+            options.Scope.Add("profile");
+            options.Scope.Add("profile_extended");
+            options.Scope.Add("email");// profile profile_extended email";
             //  options.CallbackPath = "/Home";
             options.SaveTokens = true;
             options.Events = CreateOpenIdConnectEvents(settings);
@@ -43,7 +48,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static Task Redirect(RedirectContext context)
         {
             if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
-                context.ProtocolMessage.Parameters.Add("vtr", "[\"P0.Cp.Cd\", \"P0.Cp.Ck\", \"P0.Cm\"]");
+                //context.ProtocolMessage.Parameters.Add("vtr", "[\"P0.Cp.Cd\", \"P0.Cp.Ck\", \"P0.Cm\"]");
+                context.ProtocolMessage.Parameters.Add("vtr", "[\"P9.Cp.Cd\", \"P9.Cp.Ck\", \"P9.Cm\"]");
             return Task.CompletedTask;
         }
 
