@@ -25,6 +25,7 @@ namespace NHS.Login.Client
         }
         public async IAsyncEnumerable<Claim> GetClaimsAsync()
         {
+
             var idtoken = await GetIdTokenAsync();
             var accessToken = await GetTokenAsync();
             var response = await GetUserInfoAsync(accessToken);
@@ -36,11 +37,11 @@ namespace NHS.Login.Client
         {
             return await _accessor.HttpContext.GetTokenAsync("access_token");
         }
-                private async Task<string> GetIdTokenAsync()
+
+        private async Task<string> GetIdTokenAsync()
         {
             return await _accessor.HttpContext.GetTokenAsync("id_token");
         }
-
 
         private async Task<UserInfoResponse> GetUserInfoAsync(string accessToken)
         {
