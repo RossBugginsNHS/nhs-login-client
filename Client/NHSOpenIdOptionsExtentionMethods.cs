@@ -1,3 +1,14 @@
+// Program.cs - nhs-login-client
+//  Open Government Licence 3.0 
+// 
+//   You must, acknowledge the source of the Information in your product or application by including or linking to any attribution statement 
+//  specified by the Information Provider(s) and, where  possible, provide a link to this licence;  If the Information Provider does not 
+//  provide a specific attribution statement, you must use  the following:   Contains public sector information licensed under the Open 
+//  Government Licence v3.0.  If you are using Information from several Information Providers and listing multiple attributions is not 
+//  practical in your product or application, you may  include a URI or hyperlink to a resource that contains the required attribution 
+//  statements.  These are important conditions of this licence and if you fail to comply with them the rights granted to you under this
+//   licence, or any similar licence granted by the  Licensor, will end automatically.
+
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -9,8 +20,15 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class NHSOpenIdOptionsExtentionMethods
     {
+        private static NHSLoginSettings _settings;
+        private const string _assertionType =  "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+        private const string _responseType =  "code";
+        private const string _responseMode =  "form_post";
+        private const string _vtrName =  "vtr";
+
         public static AuthenticationBuilder AddNhsLoginOpenId(this AuthenticationBuilder authenticationBuilder, NHSLoginSettings settings)
         {
+            _settings = settings;
             authenticationBuilder.AddOpenIdConnect(options =>
             {
                 SetOptions(options, settings);
@@ -23,21 +41,18 @@ namespace Microsoft.Extensions.DependencyInjection
             options.RequireHttpsMetadata = true;
             options.ClientId = settings.ClientId;
             options.Authority = settings.Authority;
-            options.ResponseType = "code";
-            options.ResponseMode = "form_post";
+            options.ResponseType = _responseType;
+            options.ResponseMode = _responseMode;
             options.Scope.Clear();
-            options.Scope.Add("openid");
-            options.Scope.Add("profile");
-            options.Scope.Add("profile_extended");
-            options.Scope.Add("email");// profile profile_extended email";
-            //  options.CallbackPath = "/Home";
+            foreach(var scope in settings.Scopes)
+                options.Scope.Add(scope);
             options.SaveTokens = true;
             options.Events = CreateOpenIdConnectEvents(settings);
         }
 
         private static OpenIdConnectEvents CreateOpenIdConnectEvents(NHSLoginSettings settings)
         {
-            var tokenHelper = new TokenHelper(settings);
+            var tokenHelper = new TokenHelper(settings);           
             return new OpenIdConnectEvents
             {
                 OnRedirectToIdentityProvider = Redirect,
@@ -47,9 +62,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static Task Redirect(RedirectContext context)
         {
+            var vtr = _settings.Vtr;
             if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
-                //context.ProtocolMessage.Parameters.Add("vtr", "[\"P0.Cp.Cd\", \"P0.Cp.Ck\", \"P0.Cm\"]");
-                context.ProtocolMessage.Parameters.Add("vtr", "[\"P9.Cp.Cd\", \"P9.Cp.Ck\", \"P9.Cm\"]");
+                context.ProtocolMessage.Parameters.Add(_vtrName, vtr);
             return Task.CompletedTask;
         }
 
@@ -57,11 +72,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (context.TokenEndpointRequest?.GrantType == OpenIdConnectGrantTypes.AuthorizationCode)
             {
-                context.TokenEndpointRequest.ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+                context.TokenEndpointRequest.ClientAssertionType = _assertionType;
                 context.TokenEndpointRequest.ClientAssertion = tokenHelper.CreateClientAuthJwt();
             }
             return Task.CompletedTask;
         }
     }
-
 }
